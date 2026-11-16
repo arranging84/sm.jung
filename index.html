@@ -1,0 +1,1519 @@
+<!DOCTYPE html>
+<html lang="ko" data-theme="dark" class="locked">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#12141a">
+<meta name="robots" content="noindex, nofollow">
+<title>우리 집 대시보드</title>
+<style>
+/* ---------- 기본 ---------- */
+*{box-sizing:border-box;margin:0;padding:0}
+html{font-size:calc(100vw / 120)}   /* 1920px 화면에서 16px 기준 */
+html[data-theme="dark"]{
+  --bg:#12141a;--bg-glow1:rgba(255,163,102,.10);--bg-glow2:rgba(90,160,255,.07);
+  --card:#1c1f27;--card2:#242833;--card3:#2b3040;
+  --line:rgba(255,255,255,.075);--line2:rgba(255,255,255,.16);
+  --text:#F4F0E8;--text2:#B6BDCB;--text3:#858D9E;
+  --accent:#FFB37A;--accent-soft:rgba(255,179,122,.13);
+  --shadow:0 1rem 2.2rem rgba(0,0,0,.38);
+  --fam:#FF9B6A;--fam-soft:rgba(255,155,106,.15);
+  --m1:#7FB2FF;--m1-soft:rgba(127,178,255,.14);
+  --m2:#F78CC1;--m2-soft:rgba(247,140,193,.14);
+  --m3:#5FDFBB;--m3-soft:rgba(95,223,187,.13);
+  --m4:#FFCF63;--m4-soft:rgba(255,207,99,.14);
+  --good:#5FDFBB;--good-soft:rgba(95,223,187,.14);
+  --normal:#FFCF63;--normal-soft:rgba(255,207,99,.14);
+  --bad:#FF9B6A;--bad-soft:rgba(255,155,106,.14);
+  --verybad:#FF7676;--verybad-soft:rgba(255,118,118,.14);
+  --cloud:#CFD8E6;--sun:#FFC24B;
+}
+html[data-theme="light"]{
+  --bg:#FBF7F1;--bg-glow1:rgba(255,186,140,.28);--bg-glow2:rgba(168,200,255,.20);
+  --card:#FFFFFF;--card2:#FBF6EF;--card3:#F4EDE3;
+  --line:rgba(58,48,38,.09);--line2:rgba(58,48,38,.20);
+  --text:#2A2520;--text2:#6A6055;--text3:#9A8E80;
+  --accent:#DE7A3F;--accent-soft:rgba(222,122,63,.11);
+  --shadow:0 .7rem 1.6rem rgba(96,70,44,.09);
+  --fam:#DE6A3C;--fam-soft:rgba(222,106,60,.12);
+  --m1:#3B7DD8;--m1-soft:rgba(59,125,216,.11);
+  --m2:#C74C8A;--m2-soft:rgba(199,76,138,.11);
+  --m3:#0F8A6C;--m3-soft:rgba(15,138,108,.11);
+  --m4:#B07708;--m4-soft:rgba(176,119,8,.13);
+  --good:#0F8A6C;--good-soft:rgba(15,138,108,.11);
+  --normal:#B07708;--normal-soft:rgba(176,119,8,.13);
+  --bad:#DE6A3C;--bad-soft:rgba(222,106,60,.12);
+  --verybad:#D64545;--verybad-soft:rgba(214,69,69,.12);
+  --cloud:#8FA3BC;--sun:#E8A21C;
+}
+body{
+  background:var(--bg);color:var(--text);overflow:hidden;
+  font-family:"SamsungOne Korean","SamsungOneUI","Apple SD Gothic Neo","Malgun Gothic","Noto Sans CJK KR","Noto Sans KR",system-ui,sans-serif;
+  -webkit-font-smoothing:antialiased;letter-spacing:-.01em;
+}
+body:before{
+  content:"";position:fixed;top:0;right:0;bottom:0;left:0;pointer-events:none;
+  background:radial-gradient(60% 55% at 12% 0%,var(--bg-glow1) 0%,rgba(0,0,0,0) 70%),
+             radial-gradient(55% 55% at 92% 92%,var(--bg-glow2) 0%,rgba(0,0,0,0) 72%);
+}
+button{font-family:inherit;color:inherit;background:none;border:0;cursor:pointer}
+:focus{outline:2px solid var(--line2);outline-offset:2px}
+:focus:not(:focus-visible){outline-color:transparent}
+:focus-visible{outline:3px solid var(--accent);outline-offset:3px;border-radius:.4rem}
+a{color:inherit}
+
+/* ---------- 레이아웃 ---------- */
+.app{
+  position:relative;height:100vh;display:grid;
+  grid-template-rows:auto auto minmax(0,1fr) auto;
+  gap:.85rem;padding:1.15rem 1.5rem 1.3rem;
+}
+.card{
+  background:var(--card);border:1px solid var(--line);border-radius:1.45rem;
+  box-shadow:var(--shadow);min-width:0;min-height:0;
+}
+.card-head{display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:.75rem 1.1rem .55rem}
+.card-head h2{font-size:1.42rem;font-weight:700;letter-spacing:-.02em}
+.card-head .sub{font-size:1.06rem;color:var(--text3);font-weight:600}
+
+/* ---------- 상단 ---------- */
+.topbar{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:1.2rem}
+.clock-block{display:flex;flex-direction:column;justify-content:center;min-width:16rem}
+.clock-row{display:flex;align-items:flex-end}
+.clock-hm{font-size:5.1rem;font-weight:300;line-height:.9;letter-spacing:-.045em;font-variant-numeric:tabular-nums}
+.clock-s{font-size:1.5rem;font-weight:600;color:var(--text3);padding-bottom:.55rem;margin-left:.5rem;font-variant-numeric:tabular-nums}
+.date-row{display:flex;align-items:center;margin-top:.5rem;font-size:1.28rem;color:var(--text2);font-weight:600}
+.date-row > span + span{margin-left:.5rem}
+.date-row .sep{color:var(--text3);font-weight:400}
+.date-row .year{color:var(--text3);font-weight:500}
+
+.wx{
+  justify-self:center;display:grid;grid-template-columns:auto auto auto;align-items:center;
+  gap:1rem;background:var(--card);border:1px solid var(--line);border-radius:1.3rem;
+  padding:.55rem 1.15rem;box-shadow:var(--shadow);
+}
+.wx-ic svg{display:block;width:3.4rem;height:3.4rem}
+.wx-main{display:grid;grid-template-columns:auto;line-height:1}
+.wx-temp{font-size:3.1rem;font-weight:300;letter-spacing:-.04em}
+.wx-temp small{font-size:1.4rem;font-weight:500;color:var(--text2);margin-left:.1rem}
+.wx-cond{font-size:1.22rem;color:var(--text2);font-weight:600;margin-top:.35rem}
+.wx-side{display:flex;flex-direction:column;gap:.3rem;padding-left:1rem;border-left:1px solid var(--line)}
+.wx-hl{font-size:1.1rem;color:var(--text2);font-weight:600}
+.wx-hl b{color:var(--text);font-weight:700}
+.wx-badges{display:flex;margin-top:.05rem}
+.badge{font-size:.98rem;font-weight:700;padding:.18rem .55rem;border-radius:.55rem;white-space:nowrap;margin-right:.4rem}
+.badge:last-child{margin-right:0}
+.badge.good{background:var(--good-soft);color:var(--good)}
+.badge.normal{background:var(--normal-soft);color:var(--normal)}
+.badge.bad{background:var(--bad-soft);color:var(--bad)}
+.badge.verybad{background:var(--verybad-soft);color:var(--verybad)}
+.wx-src{font-size:.76rem;color:var(--text3);margin-top:.1rem;line-height:1.25}
+.wx-src a{text-decoration:none;border-bottom:1px dotted var(--text3)}
+
+.top-actions{display:flex;align-items:center;justify-self:end}
+.top-actions > * + *{margin-left:.55rem}
+.icon-btn{
+  width:3.5rem;height:3.5rem;border-radius:1.1rem;background:var(--card);border:1px solid var(--line);
+  display:flex;align-items:center;justify-content:center;box-shadow:var(--shadow);
+}
+.icon-btn svg{width:1.55rem;height:1.55rem;stroke:var(--text2);fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+.icon-btn:hover{background:var(--card2)}
+.icon-btn:hover svg{stroke:var(--text)}
+.icon-btn.on svg{stroke:var(--accent)}
+
+/* ---------- 필터 칩 ---------- */
+.chips-row{display:grid;grid-template-columns:1fr auto;align-items:center;gap:1rem;min-height:2.9rem}
+.chips{display:grid;grid-auto-flow:column;grid-auto-columns:max-content;gap:.5rem;align-items:center;justify-content:start}
+.chip{
+  display:inline-grid;grid-template-columns:auto auto auto;align-items:center;gap:.45rem;
+  padding:.42rem .95rem;border-radius:2rem;background:var(--card);border:1px solid var(--line);
+  font-size:1.18rem;font-weight:700;color:var(--text2);box-shadow:none;
+}
+.chip .dot{width:.7rem;height:.7rem;border-radius:50%;background:var(--text3)}
+.chip .cnt{font-size:.92rem;color:var(--text3);font-weight:700}
+.chip:hover{background:var(--card2);color:var(--text)}
+.chip.active{background:var(--card3);color:var(--text);border-color:var(--line2)}
+.chip.active .cnt{color:var(--text2)}
+.chip.all.active{background:var(--accent);color:#1a1207;border-color:transparent}
+.chip.all.active .dot{background:#1a1207;opacity:.55}
+.chip.all.active .cnt{color:rgba(26,18,7,.6)}
+.next-pill{
+  display:grid;grid-template-columns:auto auto;align-items:center;gap:.55rem;
+  padding:.42rem .95rem;border-radius:2rem;background:var(--accent-soft);
+  border:1px solid var(--line);font-size:1.08rem;font-weight:600;color:var(--text2);white-space:nowrap;
+}
+.next-pill b{color:var(--text);font-weight:700}
+.next-pill{font-size:1.12rem}
+.next-pill .dot{width:.6rem;height:.6rem;border-radius:50%}
+
+/* ---------- 메인 ---------- */
+.main{display:grid;grid-template-columns:minmax(0,1.72fr) minmax(0,1fr);gap:.85rem;min-height:0}
+.board{display:flex;flex-direction:column;overflow:hidden}
+.board .card-head{padding:.7rem 1.1rem .5rem}
+.board-range{font-size:1.02rem;color:var(--text3);font-weight:600;margin-left:.1rem}
+.head-tools{display:grid;grid-template-columns:auto auto auto auto;gap:.4rem;align-items:center}
+.mini-btn{
+  min-width:2.4rem;height:2.2rem;padding:0 .6rem;border-radius:.7rem;background:var(--card2);
+  border:1px solid var(--line);font-size:1rem;font-weight:700;color:var(--text2);
+}
+.mini-btn:hover{color:var(--text);border-color:var(--line2)}
+.mini-btn.on{color:var(--accent);border-color:var(--accent)}
+
+.week{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:.45rem;padding:0 .7rem .7rem;flex:1;min-height:0}
+.board-hint{display:none;padding:.15rem 1.1rem .55rem;font-size:.98rem;color:var(--text3);font-weight:600}
+.day-col{
+  background:var(--card2);border:1px solid transparent;border-radius:1rem;
+  padding:.45rem .4rem .35rem;display:flex;flex-direction:column;min-height:0;overflow:hidden;
+}
+.day-col.today{background:var(--accent-soft);border-color:rgba(255,179,122,.28)}
+html[data-theme="light"] .day-col.today{border-color:rgba(222,122,63,.25)}
+.day-col.sel{border-color:var(--line2)}
+.day-col.off{opacity:.34}
+.day-head{
+  display:grid;grid-template-columns:1fr auto;align-items:baseline;gap:.2rem;
+  padding:0 .2rem .35rem;margin-bottom:.35rem;border-bottom:1px solid var(--line);width:100%;text-align:left;
+}
+.day-name{font-size:1.14rem;font-weight:700;color:var(--text2)}
+.day-name.sat{color:var(--m1)}
+.day-name.sun{color:var(--m2)}
+.day-date{font-size:1.52rem;font-weight:700;letter-spacing:-.03em;font-variant-numeric:tabular-nums}
+.day-col.today .day-date{color:var(--accent)}
+.day-dday{grid-column:1 / -1;font-size:.82rem;font-weight:700;color:var(--accent);margin-top:-.1rem}
+.ev-list{display:flex;flex-direction:column;flex:1 1 auto;min-height:0;overflow:hidden}
+.ev{
+  border-left:.22rem solid var(--c,#888);background:var(--cs,rgba(128,128,128,.1));
+  border-radius:.6rem;padding:.3rem .42rem .34rem .5rem;margin-bottom:.34rem;
+}
+.ev-time{font-size:1.08rem;font-weight:700;color:var(--text2);font-variant-numeric:tabular-nums;letter-spacing:0}
+.ev-time .al{color:var(--text3);font-weight:700}
+.ev-title{font-size:1.38rem;font-weight:650;line-height:1.24;margin-top:.1rem;word-break:keep-all;overflow-wrap:anywhere}
+.ev-who{display:grid;grid-auto-flow:column;grid-auto-columns:max-content;margin-top:.18rem}
+.ev-who i{width:.46rem;height:.46rem;border-radius:50%;display:block;background:var(--c);margin-right:.16rem}
+.ev.none{background:transparent;border-left-color:transparent;color:var(--text3);font-size:.98rem;padding-left:.2rem}
+
+/* 오늘 일정 */
+.day-panel{display:flex;flex-direction:column;overflow:hidden}
+.day-panel .card-head{padding:.7rem 1.1rem .45rem;align-items:baseline}
+.agenda{padding:0 .85rem .3rem;overflow:hidden;flex:1;min-height:0}
+.ag{
+  display:grid;grid-template-columns:4.6rem 1fr;gap:.6rem;align-items:start;
+  padding:.46rem .55rem .5rem .6rem;border-radius:.8rem;margin-bottom:.4rem;
+  background:var(--card2);border-left:.22rem solid var(--c,#888);
+}
+.ag.now{background:var(--accent-soft);box-shadow:inset 0 0 0 1px rgba(255,179,122,.3)}
+.ag-time{font-size:1.14rem;font-weight:700;color:var(--text2);font-variant-numeric:tabular-nums;padding-top:.12rem}
+.ag-time .al{color:var(--text3);font-size:.98rem}
+.ag-title{font-size:1.46rem;font-weight:650;line-height:1.24;word-break:keep-all}
+.ag-meta{font-size:1rem;color:var(--text3);margin-top:.15rem;line-height:1.3}
+.ag-tag{font-size:.8rem;font-weight:700;color:var(--accent);margin-left:.3rem}
+.ag-more{font-size:1rem;color:var(--text3);font-weight:700;padding:.15rem .6rem .35rem}
+.ag-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;color:var(--text3);font-size:1.1rem}
+.ag-empty > * + *{margin-top:.4rem}
+.ag-empty .big{font-size:2.6rem}
+
+/* ---------- 하단 ---------- */
+.bottom{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.12fr);gap:.85rem;min-height:0}
+.dday,.todo{display:flex;flex-direction:column;overflow:hidden;height:14.6rem}
+.dday-list{
+  padding:0 .8rem .2rem;flex:1;min-height:0;overflow:hidden;
+  display:grid;grid-template-columns:1fr 1fr;grid-auto-rows:min-content;
+  gap:.3rem .45rem;align-content:start;
+}
+.dd{
+  display:grid;grid-template-columns:2.9rem 1fr;gap:.5rem;align-items:center;
+  padding:.3rem .45rem;border-radius:.7rem;background:var(--card2);min-width:0;
+}
+.dd-b{font-size:1.2rem;font-weight:800;color:var(--accent);font-variant-numeric:tabular-nums;letter-spacing:-.03em;text-align:center}
+.dd-b.soon{color:var(--m2)}
+.dd-t{font-size:1.14rem;font-weight:650;line-height:1.18;word-break:keep-all;overflow:hidden}
+.dd-s{font-size:.86rem;color:var(--text3);font-weight:600;margin-top:.1rem;line-height:1.2}
+.dd.trip{grid-column:1 / -1;background:var(--accent-soft);border:1px solid rgba(255,179,122,.3);margin-top:.05rem}
+html[data-theme="light"] .dd.trip{border-color:rgba(222,122,63,.24)}
+
+.todo-count{font-size:.95rem;color:var(--text3);font-weight:700}
+.todo-list{padding:0 .8rem .2rem;overflow:hidden;flex:1;min-height:0}
+.todo-item{
+  display:grid;grid-template-columns:1.9rem 1fr 1.8rem;gap:.55rem;align-items:center;width:100%;
+  padding:.36rem .3rem;border-radius:.55rem;text-align:left;
+}
+.todo-item:hover{background:var(--card2)}
+.tick{
+  width:1.42rem;height:1.42rem;border-radius:.42rem;border:2px solid var(--line2);
+  display:flex;align-items:center;justify-content:center;background:transparent;
+}
+.tick svg{width:.85rem;height:.85rem;stroke:transparent;stroke-width:3;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.todo-item.done .tick{background:var(--good);border-color:var(--good)}
+.todo-item.done .tick svg{stroke:#08221b}
+.todo-text{font-size:1.24rem;font-weight:600;line-height:1.25;word-break:keep-all}
+.todo-text small{font-size:.84rem;color:var(--text3);font-weight:600;margin-left:.3rem}
+.todo-item.done .todo-text{text-decoration:line-through;color:var(--text3)}
+.del{width:1.5rem;height:1.5rem;border-radius:.4rem;color:var(--text3);font-size:1rem;line-height:1}
+.del:hover{color:var(--verybad);background:var(--card2)}
+.todo-add{display:grid;grid-template-columns:1fr auto;gap:.4rem;padding:.35rem .8rem .6rem}
+.todo-add input{
+  background:var(--card2);border:1px solid var(--line);border-radius:.6rem;
+  padding:.34rem .55rem;font-size:.98rem;font-family:inherit;color:var(--text);min-width:0;
+}
+.todo-add input::placeholder{color:var(--text3)}
+.todo-add button{padding:.3rem .8rem;border-radius:.6rem;background:var(--accent);color:#1a1207;font-size:.95rem;font-weight:800}
+
+/* ---------- 설정 모달 ---------- */
+.modal{position:fixed;top:0;right:0;bottom:0;left:0;background:rgba(8,10,14,.55);display:none;z-index:50}
+.modal.open{display:flex;align-items:center;justify-content:center}
+.sheet{
+  width:44rem;max-width:92vw;max-height:88vh;overflow:auto;background:var(--card);color:var(--text);
+  border:1px solid var(--line);border-radius:1.4rem;box-shadow:0 2rem 4rem rgba(0,0,0,.5);padding:1.4rem 1.6rem 1.2rem;
+}
+.sheet h3{font-size:1.5rem;font-weight:800;margin-bottom:.2rem}
+.sheet .lead{font-size:.95rem;color:var(--text3);margin-bottom:1rem}
+.field{border-top:1px solid var(--line);padding:.85rem 0}
+.field h4{font-size:1.08rem;font-weight:750;margin-bottom:.45rem}
+.field .row{display:grid;grid-template-columns:1fr auto auto;gap:.5rem;align-items:center;margin-bottom:.45rem}
+.field .row.single{grid-template-columns:max-content}
+.field label.ck{display:grid;grid-template-columns:auto 1fr;gap:.5rem;align-items:center;font-size:.98rem;color:var(--text2);font-weight:600;margin-bottom:.4rem;cursor:pointer}
+.field input[type=checkbox]{width:1.1rem;height:1.1rem;accent-color:var(--accent)}
+.field input[type=text],.field select{
+  width:100%;background:var(--card2);border:1px solid var(--line);border-radius:.55rem;
+  padding:.42rem .6rem;font-size:.95rem;font-family:inherit;color:var(--text);
+}
+.field .btn{padding:.4rem .9rem;border-radius:.6rem;background:var(--card3);border:1px solid var(--line);font-size:.92rem;font-weight:700;color:var(--text);white-space:nowrap}
+.field .btn.primary{background:var(--accent);color:#1a1207;border-color:transparent}
+.field .status{font-size:.85rem;color:var(--text3);line-height:1.4}
+.field .status b{color:var(--text2)}
+.seg{display:grid;grid-template-columns:1fr 1fr;gap:.4rem}
+.seg button{padding:.5rem;border-radius:.6rem;background:var(--card2);border:1px solid var(--line);font-size:.95rem;font-weight:700;color:var(--text2)}
+.seg button.on{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
+.sheet .foot{display:grid;grid-template-columns:1fr auto;gap:.6rem;align-items:center;margin-top:.9rem;padding-top:.9rem;border-top:1px solid var(--line)}
+.sheet .foot .hint{font-size:.82rem;color:var(--text3);line-height:1.4}
+
+/* 토스트 */
+.toast{
+  position:fixed;left:50%;bottom:2rem;transform:translateX(-50%) translateY(2rem);
+  background:var(--card3);border:1px solid var(--line2);color:var(--text);padding:.6rem 1.1rem;
+  border-radius:.8rem;font-size:1rem;font-weight:650;opacity:0;transition:opacity .25s,transform .25s;z-index:60;pointer-events:none;
+}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* ---------- 반응형 (태블릿/모바일) ---------- */
+@media (max-width:1180px){
+  .app{padding:1rem}
+  .wx{grid-template-columns:auto auto;gap:.7rem}
+  .wx-side{grid-column:1 / -1;border-left:0;padding-left:0;border-top:1px solid var(--line);padding-top:.35rem;flex-direction:row;align-items:center;gap:.8rem}
+}
+@media (max-aspect-ratio:5/4),(max-width:820px){
+  html{font-size:15px}
+  body{overflow:auto}
+  .app{height:auto;min-height:100vh;grid-template-rows:none}
+  .topbar{grid-template-columns:1fr auto;gap:.8rem}
+  .wx{justify-self:start;grid-column:1 / -1;width:100%}
+  .clock-hm{font-size:3.6rem}
+  .chips-row{grid-template-columns:1fr;gap:.5rem}
+  .chips{grid-auto-flow:row;grid-template-columns:repeat(3,max-content);gap:.4rem}
+  .next-pill{justify-self:start;white-space:normal}
+  .main{grid-template-columns:1fr;gap:.7rem}
+  .week{overflow-x:auto;grid-template-columns:repeat(7,minmax(8.5rem,1fr))}
+  .bottom{grid-template-columns:1fr}
+  .dday,.todo{height:auto;min-height:12rem}
+  .card-head h2{font-size:1.2rem}
+  .sheet{width:100%;max-height:92vh}
+}
+
+/* ---------- 화면 잠금 (PIN) ---------- */
+/* 잠금 상태에서는 대시보드·설정창을 아예 보이지 않게 가립니다(스크린리더·탭 이동에서도 제외). */
+html.locked .app,html.locked .modal,html.locked .toast{visibility:hidden}
+.lock{
+  position:fixed;top:0;right:0;bottom:0;left:0;z-index:80;display:none;
+  align-items:center;justify-content:center;padding:1.4rem;background:var(--bg);
+}
+html.locked .lock{display:flex}
+.lock:before{
+  content:"";position:absolute;top:0;right:0;bottom:0;left:0;pointer-events:none;
+  background:radial-gradient(52% 48% at 50% 0%,var(--bg-glow1) 0%,rgba(0,0,0,0) 72%),
+             radial-gradient(46% 46% at 50% 100%,var(--bg-glow2) 0%,rgba(0,0,0,0) 74%);
+}
+.lock-box{position:relative;width:26rem;max-width:100%;text-align:center}
+.lock-badge{
+  width:4.6rem;height:4.6rem;margin:0 auto 1rem;border-radius:1.4rem;
+  display:flex;align-items:center;justify-content:center;
+  background:var(--card);border:1px solid var(--line2);box-shadow:var(--shadow);
+}
+.lock-badge svg{width:2rem;height:2rem;fill:none;stroke:var(--accent);stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+.lock h1{font-size:1.85rem;font-weight:800;letter-spacing:-.02em}
+.lock .msg{min-height:1.6rem;margin:.35rem 0 1.15rem;font-size:1.05rem;font-weight:650;color:var(--text3);line-height:1.4}
+.lock .msg.err{color:var(--verybad)}
+.lock .dots{display:flex;justify-content:center;margin-bottom:1.35rem}
+.lock .dots i{
+  width:1.1rem;height:1.1rem;margin:0 .42rem;border-radius:50%;
+  border:2px solid var(--line2);background:transparent;
+  transition:background .12s,border-color .12s;
+}
+.lock .dots i.on{background:var(--accent);border-color:var(--accent)}
+.lock .keypad{display:grid;grid-template-columns:repeat(3,1fr);gap:.6rem}
+.lock .keypad button{
+  height:4.75rem;border-radius:1.1rem;background:var(--card);border:1px solid var(--line2);
+  font-size:1.95rem;font-weight:700;color:var(--text);font-variant-numeric:tabular-nums;
+  transition:background .12s,transform .08s;
+}
+.lock .keypad button:hover{background:var(--card3)}
+.lock .keypad button:active{transform:scale(.96)}
+.lock .keypad button:focus{outline:3px solid var(--accent);outline-offset:2px}
+.lock .keypad button.fn{font-size:1.1rem;font-weight:800;color:var(--text2)}
+.lock .keypad button.ok{background:var(--accent);border-color:transparent;color:#1a1207;font-size:1.15rem;font-weight:800}
+.lock .lock-hint{margin-top:1.1rem;font-size:.9rem;line-height:1.55;color:var(--text3)}
+.lock .lock-hint b{color:var(--text2);font-weight:750}
+.lock-box.shake{animation:lockShake .42s ease-in-out}
+@keyframes lockShake{
+  0%,100%{transform:translateX(0)}
+  18%{transform:translateX(-.5rem)}
+  38%{transform:translateX(.5rem)}
+  58%{transform:translateX(-.32rem)}
+  78%{transform:translateX(.32rem)}
+}
+@media (max-height:760px){
+  .lock-box{width:21rem}
+  .lock .keypad button{height:3.5rem}
+  .lock-badge{width:3.6rem;height:3.6rem;margin-bottom:.6rem}
+  .lock h1{font-size:1.45rem}
+}
+</style>
+<script>
+/* 화면 깜박임 방지: 이미 잠금을 푼 브라우저면 본문을 그리기 전에 잠금 클래스를 먼저 벗깁니다.
+   (보안 판단은 본문 맨 아래 스크립트의 initLock 이 다시 한 번 합니다.) */
+(function(){
+  try{
+    if(window.localStorage.getItem('family_dash_unlocked_v1') === 'v1-5a83dc3d'){
+      document.documentElement.className = '';
+    }
+  }catch(e){}
+})();
+</script>
+</head>
+<body>
+
+<!-- 화면 잠금 (4자리 PIN) — 해제 전에는 대시보드가 보이지 않습니다 -->
+<div class="lock" id="lock" role="dialog" aria-modal="true" aria-label="화면 잠금">
+  <div class="lock-box" id="lockBox">
+    <div class="lock-badge">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4.5" y="10.5" width="15" height="10" rx="2.6"/><path d="M8.2 10.5V7.6a3.8 3.8 0 0 1 7.6 0v2.9"/><circle cx="12" cy="15.2" r="1.15" fill="var(--accent)" stroke="none"/></svg>
+    </div>
+    <h1>우리 집 가족 대시보드</h1>
+    <p class="msg" id="lockMsg" aria-live="polite">가족 PIN 4자리를 입력해 주세요</p>
+    <div class="dots" id="pinDots" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+    <div class="keypad" id="keypad">
+      <button type="button" data-k="1">1</button>
+      <button type="button" data-k="2">2</button>
+      <button type="button" data-k="3">3</button>
+      <button type="button" data-k="4">4</button>
+      <button type="button" data-k="5">5</button>
+      <button type="button" data-k="6">6</button>
+      <button type="button" data-k="7">7</button>
+      <button type="button" data-k="8">8</button>
+      <button type="button" data-k="9">9</button>
+      <button type="button" class="fn" data-k="del">지우기</button>
+      <button type="button" data-k="0">0</button>
+      <button type="button" class="ok" data-k="ok">확인</button>
+    </div>
+    <p class="lock-hint">TV 리모컨은 방향키로 숫자를 고르고 <b>확인</b><br>키보드는 숫자 키로 바로 입력, <b>Backspace</b>로 지우기</p>
+  </div>
+</div>
+
+<div class="app">
+
+  <!-- 상단 -->
+  <header class="topbar">
+    <div class="clock-block">
+      <div class="clock-row">
+        <span class="clock-hm" id="clockHM">--:--</span>
+        <span class="clock-s" id="clockS">00</span>
+      </div>
+      <div class="date-row">
+        <span id="dateText">11월 16일 월요일</span>
+        <span class="sep">·</span>
+        <span class="year" id="yearText">2026년</span>
+      </div>
+    </div>
+
+    <div class="wx" id="wx">
+      <div class="wx-ic" id="wxIc"></div>
+      <div class="wx-main">
+        <div class="wx-temp" id="wxTemp">--<small>°C</small></div>
+        <div class="wx-cond" id="wxCond">불러오는 중</div>
+      </div>
+      <div class="wx-side">
+        <div class="wx-hl" id="wxHL">최고 --° / 최저 --°</div>
+        <div class="wx-badges" id="wxBadges"></div>
+        <div class="wx-src" id="wxSrc"></div>
+      </div>
+    </div>
+
+    <div class="top-actions">
+      <button class="icon-btn" id="btnTheme" title="다크/라이트 전환" aria-label="테마 전환">
+        <svg viewBox="0 0 24 24"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+      </button>
+      <button class="icon-btn" id="btnFull" title="전체화면" aria-label="전체화면">
+        <svg viewBox="0 0 24 24"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg>
+      </button>
+      <button class="icon-btn" id="btnSettings" title="설정" aria-label="설정">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.2"/><path d="M19.4 15a1.6 1.6 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.6 1.6 0 0 0-1.8-.3 1.6 1.6 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.6 1.6 0 0 0-1-1.5 1.6 1.6 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.6 1.6 0 0 0 .3-1.8 1.6 1.6 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.6 1.6 0 0 0 1.5-1 1.6 1.6 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.6 1.6 0 0 0 1.8.3H9a1.6 1.6 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.6 1.6 0 0 0 1 1.5 1.6 1.6 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.6 1.6 0 0 0-.3 1.8V9a1.6 1.6 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.6 1.6 0 0 0-1.5 1z"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <!-- 구성원 필터 -->
+  <div class="chips-row">
+    <div class="chips" id="chips"></div>
+    <div class="next-pill" id="nextPill"></div>
+  </div>
+
+  <!-- 메인 -->
+  <main class="main">
+    <section class="card board">
+      <div class="card-head">
+        <div style="display:flex;align-items:baseline;gap:.5rem">
+          <h2 id="boardTitle">이번 주</h2>
+          <span class="board-range" id="boardRange"></span>
+        </div>
+        <div class="head-tools">
+          <button class="mini-btn" id="btnPrev" aria-label="이전 주">‹</button>
+          <button class="mini-btn" id="btnToday" aria-label="이번 주로">오늘</button>
+          <button class="mini-btn" id="btnNext" aria-label="다음 주">›</button>
+        </div>
+      </div>
+      <div class="week" id="week"></div>
+      <div class="board-hint" id="boardHint"></div>
+    </section>
+
+    <section class="card day-panel">
+      <div class="card-head">
+        <h2 id="dayTitle">오늘 일정</h2>
+        <div class="sub" id="daySub"></div>
+      </div>
+      <div class="agenda" id="agenda"></div>
+    </section>
+  </main>
+
+  <!-- 하단 -->
+  <footer class="bottom">
+    <section class="card dday">
+      <div class="card-head"><h2>다가오는 D-Day</h2><div class="sub" id="ddaySub"></div></div>
+      <div class="dday-list" id="ddayList"></div>
+    </section>
+
+    <section class="card todo">
+      <div class="card-head"><h2>우리 집 체크리스트</h2><div class="todo-count" id="todoCount"></div></div>
+      <div class="todo-list" id="todoList"></div>
+      <form class="todo-add" id="todoForm">
+        <input type="text" id="todoInput" placeholder="할 일 추가 (예: 우유 사기)" maxlength="60" aria-label="할 일 추가">
+        <button type="submit">추가</button>
+      </form>
+    </section>
+  </footer>
+</div>
+
+<!-- 설정 -->
+<div class="modal" id="modal" role="dialog" aria-modal="true" aria-label="설정">
+  <div class="sheet" id="sheet">
+    <h3>설정</h3>
+    <div class="lead">바꾼 값은 이 브라우저에 바로 저장됩니다.</div>
+
+    <div class="field">
+      <h4>테마</h4>
+      <div class="seg" id="themeSeg">
+        <button data-theme="dark">다크 (거실 TV 권장)</button>
+        <button data-theme="light">라이트 (웜 화이트)</button>
+      </div>
+    </div>
+
+    <div class="field">
+      <h4>날씨 자동 갱신 · Open-Meteo</h4>
+      <label class="ck"><input type="checkbox" id="wxAuto"> 30분마다 설정한 위치의 날씨 새로 불러오기 (인터넷 필요)</label>
+      <div class="row">
+        <input type="text" id="wxLat" placeholder="위도 (예: 37.5665)" spellcheck="false" aria-label="날씨 위도">
+        <input type="text" id="wxLon" placeholder="경도 (예: 126.9780)" spellcheck="false" aria-label="날씨 경도">
+        <button class="btn" id="wxPlaceSave">위치 저장</button>
+      </div>
+      <div class="status">기본값은 서울입니다. 우리 동네 좌표를 넣으면 그 위치 날씨·미세먼지를 보여줘요.</div>
+      <div class="row single">
+        <button class="btn" id="wxNow">지금 새로고침</button>
+      </div>
+      <div class="status" id="wxStatus"></div>
+    </div>
+
+    <div class="field">
+      <h4>구글 캘린더 실시간 연동</h4>
+      <label class="ck"><input type="checkbox" id="calAuto"> 15분마다 자동 동기화</label>
+      <div class="row">
+        <input type="text" id="calUrl" placeholder="https://script.google.com/macros/s/.../exec (JSON 주소)" spellcheck="false">
+        <button class="btn" id="calNow">지금 동기화</button>
+        <button class="btn primary" id="calSave">저장</button>
+      </div>
+      <div class="status" id="calStatus"></div>
+    </div>
+
+    <div class="field">
+      <h4>구성원 이름</h4>
+      <div class="row">
+        <input type="text" id="memberNames" placeholder="가족, 구성원1, 구성원2, 구성원3, 구성원4" spellcheck="false" aria-label="구성원 이름">
+        <button class="btn primary" id="memberSave">저장</button>
+      </div>
+      <div class="status">쉼표로 구분해 최대 5개(첫 칸은 '가족'). 이 이름은 이 브라우저에만 저장되고, 캘린더 동기화 때 구성원 표시에도 그대로 쓰여요.</div>
+    </div>
+
+    <div class="field">
+      <h4>화면 잠금 (PIN)</h4>
+      <div class="row single">
+        <button class="btn" id="lockNow">지금 잠그기</button>
+      </div>
+      <div class="status">누르면 화면이 바로 잠기고, 다음에 열 때 4자리 PIN을 다시 물어봅니다.<br>PIN을 풀어 둔 상태는 이 브라우저에만 저장되어, 같은 TV에서는 다시 입력하지 않아도 됩니다.</div>
+    </div>
+
+    <div class="field">
+      <h4>데이터</h4>
+      <div class="status" id="dataStatus"></div>
+    </div>
+
+    <div class="foot">
+      <div class="hint">Esc 로 닫기 · 태블릿에서는 화면을 눌러 설정해 주세요.</div>
+      <button class="btn primary" id="modalClose">닫기</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* =======================================================
+   우리 집 가족 대시보드 · 단일 파일 / 바닐라 JS
+   - 1920x1080 16:9 TV 한 화면 기준 (세로 스크롤 없음)
+   - 삼성 Tizen 브라우저 호환: 표준 CSS Grid/Flex + ES5~ES6 기본 문법
+   ======================================================= */
+(function(){
+  'use strict';
+
+  /* ---------- 내장 일정 ----------
+     배포본은 개인 일정을 담지 않습니다. 빈 배열로 시작하고,
+     ⚙️ 설정에서 구글 캘린더 Apps Script URL 을 넣으면 그때부터 실제 일정이 뜹니다. */
+  var SEED = [];
+
+  /* ---------- 내장 날씨 (Apple Weather / AirKorea, 2026-11-16 23:00 기준) ---------- */
+  var SEED_WX = {
+    temp:null, feels:null, cond:'날씨 정보 없음', code:'cloudy', hi:null, lo:null,
+    pm10:null, pm25:null, pm10g:'', pm25g:'',
+    at:'', live:false, src:''
+  };
+
+  /* ---------- D-Day ----------
+     배포본은 개인 기념일을 담지 않습니다. 필요하면 아래 배열에 직접 추가하세요.
+     {d:'2027-01-01', t:'신정', s:''} 형태. */
+  var MILESTONES = [];
+
+  /* 구성원: 배포본 기본값은 일반 이름. ⚙️ 설정에서 실제 이름으로 바꾸면 이 브라우저에만 저장됩니다. */
+  var MEMBER_COLORS = ['fam','m1','m2','m3','m4'];
+  var MEMBER_DEFAULT = ['가족','구성원1','구성원2','구성원3','구성원4'];
+  var MEMBERS = [];
+  var CLS = {};
+  function buildMembers(){
+    var names = store.get('fd_members', MEMBER_DEFAULT);
+    if(!names || !names.length) names = MEMBER_DEFAULT.slice(0);
+    MEMBERS.length = 0;
+    CLS = {};
+    MEMBERS.push({id:'all', name:'전체', c:'all'});
+    for(var i=0;i<names.length && i<MEMBER_COLORS.length;i++){
+      var nm = String(names[i] == null ? '' : names[i]).replace(/^\s+|\s+$/g,'');
+      if(!nm) nm = MEMBER_DEFAULT[i];
+      MEMBERS.push({id:nm, name:nm, c:MEMBER_COLORS[i]});
+      CLS[nm] = MEMBER_COLORS[i];
+    }
+  }
+  var WEEK = ['일','월','화','수','목','금','토'];
+
+  /* 초기 체크리스트 (배포본은 비어 있음) */
+  var DEFAULT_TODO = [];
+
+  /* ---------- 저장소 ---------- */
+  var store = {
+    get:function(k, dv){
+      try{ var v = window.localStorage.getItem(k); return v===null? dv : JSON.parse(v); }catch(e){ return dv; }
+    },
+    set:function(k, v){ try{ window.localStorage.setItem(k, JSON.stringify(v)); }catch(e){} }
+  };
+
+  buildMembers();
+
+  var WX_DEFAULT = {lat:37.5665, lon:126.9780};   /* 기본 날씨 위치: 서울 (⚙️ 설정에서 변경) */
+  var settings = store.get('fd_settings', {wxAuto:true, calAuto:false, calUrl:'', lat:WX_DEFAULT.lat, lon:WX_DEFAULT.lon});
+  var todos    = store.get('fd_todo', DEFAULT_TODO.slice(0));
+  var theme    = store.get('fd_theme', 'dark');
+  var remoteEvents = store.get('fd_remote', null);
+  var remoteAt = store.get('fd_remote_at', 0);
+  var liveWx   = store.get('fd_wx', null);
+
+  var state = {
+    filter:'all',
+    sel:null,      /* 선택한 날짜 키 (null = 오늘) */
+    off:0,          /* 주간 보드 시작 오프셋(일) */
+    events: (remoteEvents && remoteEvents.length) ? remoteEvents : SEED,
+    wx: liveWx || SEED_WX
+  };
+
+  /* ---------- 유틸 ---------- */
+  function pad2(n){ n = Number(n); return n<10 ? '0'+n : ''+n; }
+  function parseD(s){
+    if(!s) return null;
+    if(s.length <= 10){ var p = s.split('-'); return new Date(Number(p[0]), Number(p[1])-1, Number(p[2])); }
+    var dp = s.substring(0,10).split('-'), tp = s.substring(11,16).split(':');
+    return new Date(Number(dp[0]), Number(dp[1])-1, Number(dp[2]), Number(tp[0]), Number(tp[1]), 0, 0);
+  }
+  function dayKey(d){ return d.getFullYear()+'-'+pad2(d.getMonth()+1)+'-'+pad2(d.getDate()); }
+  function addDays(d, n){ var x = new Date(d.getFullYear(), d.getMonth(), d.getDate()); x.setDate(x.getDate()+n); return x; }
+  function startOfDay(d){ return new Date(d.getFullYear(), d.getMonth(), d.getDate()); }
+  function fmtHM(d){ return pad2(d.getHours())+':'+pad2(d.getMinutes()); }
+  function fmtMD(d){ return (d.getMonth()+1)+'/'+d.getDate(); }
+  function sameDay(a,b){ return a.getFullYear()===b.getFullYear() && a.getMonth()===b.getMonth() && a.getDate()===b.getDate(); }
+  function esc(s){
+    return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+  function cls(who){ return CLS[who] || 'fam'; }
+
+  /* ---------- 날씨 아이콘 ---------- */
+  function icon(code){
+    var cloud = '<path d="M7.5 18h9.2a3.3 3.3 0 0 0 .2-6.6 5 5 0 0 0-9.6-1.2A3.6 3.6 0 0 0 7.5 18z" fill="var(--cloud)"/>';
+    var sun = '<circle cx="12" cy="12" r="4.1" fill="var(--sun)"/>';
+    if(code==='clear') return '<svg viewBox="0 0 24 24">'+sun+
+      '<g stroke="var(--sun)" stroke-width="1.7" stroke-linecap="round"><path d="M12 2.6v2.2M12 19.2v2.2M2.6 12h2.2M19.2 12h2.2M5.3 5.3l1.6 1.6M17.1 17.1l1.6 1.6M18.7 5.3l-1.6 1.6M6.9 17.1l-1.6 1.6"/></g></svg>';
+    if(code==='partly') return '<svg viewBox="0 0 24 24">'+sun+
+      '<g stroke="var(--sun)" stroke-width="1.6" stroke-linecap="round"><path d="M12 2.4v1.9M4.6 5.2l1.3 1.3M2.4 12h1.9"/></g>'+cloud+'</svg>';
+    if(code==='cloudy') return '<svg viewBox="0 0 24 24"><path d="M9 15.5h9a2.9 2.9 0 0 0 0-5.8 4.4 4.4 0 0 0-8.5-1 3.2 3.2 0 0 0-.5 6.8z" fill="var(--cloud)" opacity=".55"/>'+
+      '<path d="M7.2 19.2h9.6a3.4 3.4 0 0 0 .2-6.8 5.1 5.1 0 0 0-9.8-1.2 3.7 3.7 0 0 0 0 8z" fill="var(--cloud)"/></svg>';
+    if(code==='rain') return '<svg viewBox="0 0 24 24"><path d="M7.5 14.5h9.2a3.3 3.3 0 0 0 .2-6.6 5 5 0 0 0-9.6-1.2 3.6 3.6 0 0 0 .2 7.8z" fill="var(--cloud)"/>'+
+      '<g stroke="var(--m1)" stroke-width="1.9" stroke-linecap="round"><path d="M8.6 17.4l-.8 2.4M12.2 17.4l-.8 2.4M15.8 17.4l-.8 2.4"/></g></svg>';
+    if(code==='drizzle') return '<svg viewBox="0 0 24 24"><path d="M7.5 14h9.2a3.3 3.3 0 0 0 .2-6.6 5 5 0 0 0-9.6-1.2A3.6 3.6 0 0 0 7.5 14z" fill="var(--cloud)"/>'+
+      '<g stroke="var(--m1)" stroke-width="1.7" stroke-linecap="round"><path d="M9.4 16.8v1.1M12.6 17.4v1.1M15.6 16.8v1.1"/></g></svg>';
+    if(code==='snow') return '<svg viewBox="0 0 24 24"><path d="M7.5 14h9.2a3.3 3.3 0 0 0 .2-6.6 5 5 0 0 0-9.6-1.2A3.6 3.6 0 0 0 7.5 14z" fill="var(--cloud)"/>'+
+      '<g fill="var(--yunior,var(--text2))"><circle cx="9" cy="17.4" r="1"/><circle cx="12.4" cy="19" r="1"/><circle cx="15.6" cy="17.4" r="1"/></g></svg>';
+    if(code==='fog') return '<svg viewBox="0 0 24 24">'+cloud+
+      '<g stroke="var(--text2)" stroke-width="1.6" stroke-linecap="round" opacity=".8"><path d="M5 20h10M8 22h11"/></g></svg>';
+    return '<svg viewBox="0 0 24 24">'+cloud+'</svg>';
+  }
+
+  /* ---------- 날씨 렌더 ---------- */
+  function gradeCls(g){
+    if(!g) return 'normal';
+    if(g.indexOf('매우')===0) return 'verybad';
+    if(g.indexOf('좋음')===0) return 'good';
+    if(g.indexOf('보통')===0) return 'normal';
+    if(g.indexOf('나쁨')===0) return 'bad';
+    return 'normal';
+  }
+  function paintWx(){
+    var w = state.wx;
+    document.getElementById('wxIc').innerHTML = icon(w.code);
+    document.getElementById('wxTemp').innerHTML = (w.temp!=null ? Math.round(w.temp) : '--') + '<small>°C</small>';
+    document.getElementById('wxCond').textContent = w.cond || '날씨 정보 없음';
+    document.getElementById('wxHL').innerHTML = (w.hi!=null && w.lo!=null)
+      ? '최고 <b>'+Math.round(w.hi)+'°</b> / 최저 <b>'+Math.round(w.lo)+'°</b>' + (w.feels!=null? ' · 체감 <b>'+Math.round(w.feels)+'°</b>':'')
+      : '최고 --° / 최저 --°';
+
+    var b = '';
+    if(w.pm10!=null) b += '<span class="badge '+gradeCls(w.pm10g)+'">미세 '+Math.round(w.pm10)+' '+esc(w.pm10g||'')+'</span>';
+    if(w.pm25!=null) b += '<span class="badge '+gradeCls(w.pm25g)+'">초미세 '+Math.round(w.pm25)+' '+esc(w.pm25g||'')+'</span>';
+    if(!b) b = '<span class="badge normal">미세먼지 정보 없음</span>';
+    document.getElementById('wxBadges').innerHTML = b;
+
+    var src;
+    if(w.live){
+      src = esc(w.at||'방금') + ' · Open-Meteo';
+      if(w.pm25!=null) src += ' · AirKorea 기준';
+    }else{
+      src = (w.at ? esc(w.at) + '<br>' : '⚙️ 설정에서 새로고침<br>') + '<a href="https://developer.apple.com/weatherkit/data-source-attribution/" target="_blank" rel="noopener">&#xF8FF; Weather</a> · <a href="https://www.airkorea.or.kr/" target="_blank" rel="noopener">AirKorea</a>';
+    }
+    document.getElementById('wxSrc').innerHTML = src;
+  }
+
+  /* ---------- 시계 ---------- */
+  var lastMinute = -1;
+  function tick(){
+    var now = new Date();
+    document.getElementById('clockHM').textContent = pad2(now.getHours())+':'+pad2(now.getMinutes());
+    document.getElementById('clockS').textContent = pad2(now.getSeconds());
+    document.getElementById('dateText').textContent = (now.getMonth()+1)+'월 '+now.getDate()+'일 '+WEEK[now.getDay()]+'요일';
+    document.getElementById('yearText').textContent = now.getFullYear()+'년';
+    if(now.getMinutes() !== lastMinute){ lastMinute = now.getMinutes(); paintNext(); paintAgenda(); paintWeek(); }
+  }
+
+  /* ---------- 이벤트 조회 ---------- */
+  function evDate(e){ return parseD(e.s); }
+  function evEnd(e){ return e.ad ? parseD(e.s) : parseD(e.e); }
+  function visible(e){
+    if(state.filter === 'all') return true;
+    var who = e.who || [];
+    for(var i=0;i<who.length;i++){ if(who[i] === state.filter) return true; }
+    return false;
+  }
+  function eventsOn(d){
+    var out = [];
+    for(var i=0;i<state.events.length;i++){
+      var e = state.events[i];
+      var st = evDate(e), en = evEnd(e);
+      if(!st) continue;
+      var hit = e.ad ? sameDay(st, d) : (startOfDay(st).getTime() <= d.getTime() && d.getTime() <= startOfDay(en).getTime() && sameDay(st,d));
+      if(!hit && !e.ad){
+        /* 여러 날짜에 걸친 일정(예: 밤 늦은 종일)은 시작일만 표시 */
+        hit = false;
+      }
+      if(hit && visible(e)) out.push(e);
+    }
+    out.sort(function(a,b){
+      if(a.ad !== b.ad) return a.ad ? -1 : 1;
+      return evDate(a) - evDate(b);
+    });
+    return out;
+  }
+  function nextEvent(){
+    var now = new Date();
+    var best = null, bestT = null;
+    for(var i=0;i<state.events.length;i++){
+      var e = state.events[i];
+      if(e.ad || !visible(e)) continue;
+      var st = evDate(e);
+      if(!st || st.getTime() <= now.getTime()) continue;   /* 이미 시작한 일정은 '진행 중'으로 표시되고 다음 일정에서 제외 */
+      if(!best || st.getTime() < bestT.getTime()){ best = e; bestT = st; }
+    }
+    return best ? {e:best, at:bestT} : null;
+  }
+
+  /* ---------- 구성원 칩 ---------- */
+  function paintChips(){
+    var html = '';
+    for(var i=0;i<MEMBERS.length;i++){
+      var m = MEMBERS[i];
+      var on = (state.filter === m.id);
+      var c = m.c === 'all' ? '' : ' style="--c:var(--'+m.c+')"';
+      html += '<button class="chip '+m.c+(on?' active':'')+'" data-f="'+m.id+'"'+c+'>' +
+              '<span class="dot" style="background:'+(m.c==='all'?'currentColor':'var(--'+m.c+')')+'"></span>' +
+              esc(m.name) + '</button>';
+    }
+    document.getElementById('chips').innerHTML = html;
+  }
+
+  function paintNext(){
+    var nx = nextEvent(), el = document.getElementById('nextPill');
+    if(!nx){ el.innerHTML = '<span class="dot" style="background:var(--text3)"></span><span>다음 일정 없음</span>'; return; }
+    var st = nx.at, now = new Date();
+    var hm = fmtHM(st);
+    var when;
+    if(sameDay(st, now)) when = '오늘 ' + hm;
+    else if(sameDay(st, addDays(now,1))) when = '내일 ' + hm;
+    else when = fmtMD(st) + ' (' + WEEK[st.getDay()] + ') ' + hm;
+    var mins = Math.round((st.getTime() - now.getTime())/60000);
+    var left = mins < 60 ? (mins<=0?'곧':mins+'분 후') : (mins < 1440 ? Math.round(mins/60)+'시간 후' : Math.round(mins/1440)+'일 후');
+    var c = cls((nx.e.who||['가족'])[0]);
+    el.innerHTML = '<span class="dot" style="background:var(--'+c+')"></span><span>다음 · <b>'+esc(nx.e.t)+'</b> · '+when+' <span style="color:var(--text3)">('+left+')</span></span>';
+  }
+
+  /* ---------- 주간 보드 ---------- */
+  function paintWeek(){
+    var today = startOfDay(new Date());
+    var start = addDays(today, state.off);
+    var end = addDays(start, 6);
+    document.getElementById('boardTitle').textContent = state.off===0 ? '이번 주' : (state.off<0?'지난 주':'다음 주');
+    document.getElementById('boardRange').textContent = fmtMD(start)+' – '+fmtMD(end);
+
+    var html = '';
+    var totalWeek = 0;
+    for(var i=0;i<7;i++){
+      var d = addDays(start, i);
+      var list = eventsOn(d);
+      totalWeek += list.length;
+      var isToday = sameDay(d, today);
+      var selKey = state.sel || dayKey(today);
+      var cls2 = ['day-col'];
+      if(isToday) cls2.push('today');
+      if(dayKey(d) === selKey) cls2.push('sel');
+      var dow = WEEK[d.getDay()];
+      var dn = 'day-name' + (d.getDay()===6?' sat':(d.getDay()===0?' sun':''));
+
+      html += '<div class="'+cls2.join(' ')+'">';
+      html += '<button class="day-head" data-day="'+dayKey(d)+'" aria-label="'+fmtMD(d)+' '+dow+'요일 일정 보기">';
+      html += '<span class="'+dn+'">'+dow+'</span><span class="day-date">'+d.getDate()+'</span>';
+      if(isToday) html += '<span class="day-dday">오늘</span>';
+      html += '</button>';
+      html += '<div class="ev-list">';
+      if(!list.length) html += '<div class="ev none">일정 없음</div>';
+      for(var j=0;j<list.length;j++){
+        var e = list[j];
+        var c = cls((e.who||['가족'])[0]);
+        html += '<div class="ev" style="--c:var(--'+c+');--cs:var(--'+c+'-soft)">';
+        html += '<div class="ev-time">'+(e.ad ? '<span class="al">종일</span>' : fmtHM(evDate(e)))+'</div>';
+        html += '<div class="ev-title">'+esc(e.t)+'</div>';
+        if(e.who && e.who.length>1){
+          html += '<div class="ev-who">';
+          for(var k=0;k<e.who.length;k++) html += '<i style="background:var(--'+cls(e.who[k])+')"></i>';
+          html += '</div>';
+        }
+        html += '</div>';
+      }
+      html += '</div></div>';
+    }
+    document.getElementById('week').innerHTML = html;
+    fitOverflow('.ev-list', '.ev', '외 ');
+
+    var hint = document.getElementById('boardHint');
+    if(hint){
+      var empty = (totalWeek === 0 && state.filter === 'all');
+      hint.style.display = empty ? 'block' : 'none';
+      if(empty) hint.innerHTML = '이 주에는 내장 일정이 없습니다. ⚙️ 설정에서 구글 캘린더 동기화를 연결하면 계속 최신 일정이 보입니다.';
+    }
+  }
+
+  /* 공간을 넘치는 목록은 마지막 항목 대신 "외 N건"으로 접어 잘림을 막는다 */
+  function fitOverflow(listSel, itemCls, prefix){
+    var lists = document.querySelectorAll(listSel);
+    for(var i=0;i<lists.length;i++){
+      var L = lists[i];
+      if(L.scrollHeight <= L.clientHeight + 2) continue;
+      var hidden = 0;
+      while(L.scrollHeight > L.clientHeight + 2 && L.lastElementChild){
+        var last = L.lastElementChild;
+        if(last.className.indexOf(itemCls.replace('.','')) !== 0) break;
+        L.removeChild(last); hidden++;
+      }
+      if(hidden){
+        var more = document.createElement('div');
+        more.className = (itemCls === '.ev' ? 'ev none' : 'ag-more');
+        more.textContent = prefix + hidden + '건';
+        L.appendChild(more);
+      }
+    }
+  }
+
+  /* ---------- 오늘(선택일) 일정 ---------- */
+  function paintAgenda(){
+    var today = startOfDay(new Date());
+    var d = state.sel ? parseD(state.sel) : today;
+    var isToday = sameDay(d, today);
+    var list = eventsOn(d);
+    document.getElementById('dayTitle').textContent = isToday ? '오늘 일정' : (fmtMD(d)+' '+WEEK[d.getDay()]+'요일 일정');
+    var subEl = document.getElementById('daySub');
+    if(isToday){ subEl.innerHTML = (d.getMonth()+1)+'월 '+d.getDate()+'일 · '+list.length+'건'; }
+    else { subEl.innerHTML = esc(fmtMD(d)+' ('+WEEK[d.getDay()]+')')+' · '+list.length+'건 <button class="mini-btn" id="agToday" style="margin-left:.5rem;vertical-align:middle">오늘로</button>'; }
+
+    var now = new Date();
+    var html = '';
+    for(var i=0;i<list.length;i++){
+      var e = list[i];
+      var c = cls((e.who||['가족'])[0]);
+      var st = evDate(e), en = evEnd(e);
+      var isNow = !e.ad && isToday && st.getTime() <= now.getTime() && now.getTime() < (en.getTime()||st.getTime()+3600000);
+      var tag = '';
+      if(isNow) tag = '<span class="ag-tag">진행 중</span>';
+      else if(!e.ad && isToday && st.getTime() > now.getTime() && i === indexOfNextToday(list, now)) tag = '<span class="ag-tag" style="color:var(--text2)">다음</span>';
+      html += '<div class="ag'+(isNow?' now':'')+'" style="--c:var(--'+c+')">';
+      html += '<div class="ag-time">'+(e.ad?'<span class="al">종일</span>':fmtHM(st))+'</div>';
+      html += '<div>';
+      html += '<div class="ag-title">'+esc(e.t)+tag+'</div>';
+      var meta = [];
+      for(var w=0;w<(e.who||[]).length;w++) meta.push(e.who[w]);
+      if(!e.ad && en) meta.push(fmtHM(st)+'~'+fmtHM(en));
+      if(e.loc) meta.push(e.loc);
+      if(e.note) meta.push(e.note.length > 44 ? e.note.substring(0,44)+'…' : e.note);
+      if(meta.length) html += '<div class="ag-meta">'+esc(meta.join(' · '))+'</div>';
+      html += '</div></div>';
+    }
+    if(!list.length){
+      html = '<div class="ag-empty"><div class="big">🌿</div><div>일정이 없는 날이에요</div></div>';
+    }
+    document.getElementById('agenda').innerHTML = html;
+    fitOverflow('.agenda', '.ag', '외 ');
+  }
+  function indexOfNextToday(list, now){
+    var best = -1, bestT = null;
+    for(var i=0;i<list.length;i++){
+      var e = list[i];
+      if(e.ad) continue;
+      var st = evDate(e);
+      if(st.getTime() <= now.getTime()) continue;
+      if(best<0 || st.getTime() < bestT.getTime()){ best = i; bestT = st; }
+    }
+    return best;
+  }
+
+  /* ---------- D-Day ---------- */
+  function ddayText(d){
+    var today = startOfDay(new Date());
+    var diff = Math.round((d.getTime() - today.getTime())/86400000);
+    if(diff === 0) return 'D-DAY';
+    if(diff > 0) return 'D-' + diff;
+    return 'D+' + Math.abs(diff);
+  }
+  function paintDDay(){
+    var today = startOfDay(new Date());
+    var upcoming = [];
+    for(var i=0;i<MILESTONES.length;i++){
+      var d = parseD(MILESTONES[i].d);
+      var diff = Math.round((d.getTime() - today.getTime())/86400000);
+      if(diff >= 0) upcoming.push({m:MILESTONES[i], d:d, diff:diff});
+    }
+    var html = '';
+    var shown = 0;
+    for(var j=0;j<upcoming.length && shown<4;j++){
+      var it = upcoming[j];
+      if(it.m.trip) continue;   /* 여행은 아래 전용 줄 */
+      var sub = fmtMD(it.d)+' ('+WEEK[it.d.getDay()]+')' + (it.m.s ? ' · '+it.m.s : '');
+      html += '<div class="dd">';
+      html += '<div class="dd-b'+(it.diff<=3?' soon':'')+'">'+ddayText(it.d)+'</div>';
+      html += '<div><div class="dd-t">'+esc(it.m.t)+'</div><div class="dd-s">'+esc(sub)+'</div></div>';
+      html += '</div>';
+      shown++;
+    }
+    for(var k=0;k<upcoming.length;k++){
+      if(!upcoming[k].m.trip) continue;
+      var t = upcoming[k];
+      var tsub = fmtMD(t.d)+' ('+WEEK[t.d.getDay()]+') · ' + (t.m.s||'');
+      html += '<div class="dd trip">';
+      html += '<div class="dd-b">'+ddayText(t.d)+'</div>';
+      html += '<div><div class="dd-t">✈ '+esc(t.m.t)+'</div><div class="dd-s">'+esc(tsub)+'</div></div>';
+      html += '</div>';
+      break;
+    }
+    if(!html) html = '<div class="ag-empty" style="min-height:6rem"><div>설정된 D-Day가 없어요</div></div>';
+    document.getElementById('ddayList').innerHTML = html;
+    document.getElementById('ddaySub').textContent = upcoming.length ? ('가장 가까운 ' + (upcoming[0].diff===0?'오늘':upcoming[0].diff+'일 뒤')) : '';
+  }
+
+  /* ---------- 체크리스트 ---------- */
+  function paintTodo(){
+    var html = '', done = 0;
+    for(var i=0;i<todos.length;i++){
+      var t = todos[i];
+      if(t.done) done++;
+      html += '<div class="todo-item'+(t.done?' done':'')+'" data-id="'+esc(t.id)+'">';
+      html += '<button class="tick" aria-label="완료 표시" aria-pressed="'+(t.done?'true':'false')+'"><svg viewBox="0 0 24 24"><path d="M5 13l4.2 4.2L19 7"/></svg></button>';
+      html += '<div class="todo-text">'+esc(t.text)+(t.note?'<small>'+esc(t.note)+'</small>':'')+'</div>';
+      html += '<button class="del" aria-label="삭제">✕</button>';
+      html += '</div>';
+    }
+    if(!todos.length) html = '<div class="ag-empty" style="min-height:6rem"><div>비어 있어요. 아래에 추가해 보세요.</div></div>';
+    document.getElementById('todoList').innerHTML = html;
+    document.getElementById('todoCount').textContent = done + ' / ' + todos.length;
+  }
+
+  /* ---------- Open-Meteo ---------- */
+  function wmo(code){
+    code = Number(code);
+    if(code === 0) return {c:'맑음', k:'clear'};
+    if(code === 1) return {c:'대체로 맑음', k:'partly'};
+    if(code === 2) return {c:'구름 조금', k:'partly'};
+    if(code === 3) return {c:'흐림', k:'cloudy'};
+    if(code === 45 || code === 48) return {c:'안개', k:'fog'};
+    if(code >= 51 && code <= 57) return {c:'이슬비', k:'drizzle'};
+    if((code >= 61 && code <= 65) || code === 80 || code === 82) return {c:'비', k:'rain'};
+    if(code === 66 || code === 67) return {c:'진눈깨비', k:'rain'};
+    if((code >= 71 && code <= 77) || code === 85 || code === 86) return {c:'눈', k:'snow'};
+    if(code >= 95) return {c:'뇌우', k:'rain'};
+    return {c:'흐림', k:'cloudy'};
+  }
+  function pmGrade(kind, v){
+    if(v==null) return '';
+    if(kind==='pm10'){ if(v<=30) return '좋음'; if(v<=80) return '보통'; if(v<=150) return '나쁨'; return '매우나쁨'; }
+    if(v<=15) return '좋음'; if(v<=35) return '보통'; if(v<=75) return '나쁨'; return '매우나쁨';
+  }
+  function fetchWx(manual){
+    if(!window.fetch){ toast('이 브라우저는 자동 갱신을 지원하지 않아요'); return; }
+    var wlat = (Number(settings.lat) || WX_DEFAULT.lat), wlon = (Number(settings.lon) || WX_DEFAULT.lon);
+    var u1 = 'https://api.open-meteo.com/v1/forecast?latitude=' + wlat + '&longitude=' + wlon +
+      '&current=temperature_2m,apparent_temperature,relative_humidity_2m,weather_code' +
+      '&daily=weather_code,temperature_2m_max,temperature_2m_min&timezone=Asia%2FSeoul&forecast_days=3';
+    var u2 = 'https://air-quality-api.open-meteo.com/v1/air-quality?latitude=' + wlat + '&longitude=' + wlon +
+      '&current=pm10,pm2_5&timezone=Asia%2FSeoul';
+    setWxStatus('불러오는 중…');
+    try{
+      fetch(u1, {cache:'no-store'}).then(function(r){ return r.json(); }).then(function(j){
+        var cur = j.current || {}, dl = j.daily || {};
+        var w = wmo(cur.weather_code);
+        var now = new Date();
+        var nx = {
+          temp: cur.temperature_2m, feels: cur.apparent_temperature,
+          cond: w.c, code: w.k,
+          hi: (dl.temperature_2m_max||[])[0], lo: (dl.temperature_2m_min||[])[0],
+          pm10:null, pm25:null, pm10g:'', pm25g:'',
+          at: '기준 ' + pad2(now.getHours())+':'+pad2(now.getMinutes()), live:true
+        };
+        return fetch(u2, {cache:'no-store'}).then(function(r){ return r.json(); }).then(function(a){
+          var c = (a && a.current) || {};
+          if(c.pm10!=null){ nx.pm10 = c.pm10; nx.pm10g = pmGrade('pm10', c.pm10); }
+          if(c.pm2_5!=null){ nx.pm25 = c.pm2_5; nx.pm25g = pmGrade('pm25', c.pm2_5); }
+          return nx;
+        }).catch(function(){ return nx; });
+      }).then(function(nx){
+        state.wx = nx;
+        store.set('fd_wx', nx);
+        paintWx();
+        setWxStatus('자동 갱신 완료 · ' + nx.at, true);
+        if(manual) toast('날씨를 새로 불러왔어요');
+      }).catch(function(err){
+        setWxStatus('자동 갱신 실패 (오프라인이거나 차단됨). 내장 데이터를 그대로 보여줘요.');
+        if(manual) toast('날씨 갱신에 실패했어요');
+      });
+    }catch(e){
+      setWxStatus('자동 갱신 실패: ' + e);
+    }
+  }
+  function setWxStatus(msg, ok){
+    var el = document.getElementById('wxStatus');
+    if(el) el.innerHTML = msg;
+  }
+
+  /* ---------- 구글 캘린더 동기화 ---------- */
+  /* 설정에 적힌 구성원 이름으로 매핑표를 만든다 (영문 소문자 키도 함께). */
+  function buildNameMap(){
+    var m = {'family':MEMBER_DEFAULT[0], '공통':MEMBER_DEFAULT[0]};
+    for(var i=1;i<MEMBERS.length;i++){
+      var nm = MEMBERS[i].name;
+      m[nm] = nm;
+      m[nm.toLowerCase()] = nm;
+    }
+    return m;
+  }
+  /* '개인_구성원1', '구성원1 캘린더' 처럼 이름이 섞여 있어도 구성원을 찾아낸다. */
+  function matchMember(v){
+    var raw = String(v == null ? '' : v).replace(/\s+/g,'');
+    if(!raw) return '';
+    var mm = buildNameMap();
+    if(mm[raw]) return mm[raw];
+    if(mm[raw.toLowerCase()]) return mm[raw.toLowerCase()];
+    for(var i=1;i<MEMBERS.length;i++){
+      var nm = MEMBERS[i].name;
+      if(nm && raw.indexOf(nm) > -1) return nm;
+    }
+    return '';
+  }
+
+  function normalizeRemote(raw){
+    var arr = [];
+    if(!raw) return arr;
+    if(Object.prototype.toString.call(raw) === '[object Array]') arr = raw;
+    else arr = raw.events || raw.items || raw.data || [];
+    var out = [];
+    var nameMap = buildNameMap();
+    for(var i=0;i<arr.length;i++){
+      var r = arr[i] || {};
+      var st = r.start, en = r.end, s = '', e = '';
+      if(typeof st === 'string') s = st;
+      else if(st) s = st.dateTime || st.date || '';
+      if(typeof en === 'string') e = en;
+      else if(en) e = en.dateTime || en.date || '';
+      if(!s) continue;
+      var ad = (s.length <= 10) ? 1 : 0;
+      s = s.replace(' ', 'T');
+      e = (e || s).replace(' ', 'T');
+      if(ad){ s = s.substring(0,10); e = e.substring(0,10); }
+      else { s = s.substring(0,16); e = e.substring(0,16); }
+      var who = [];
+      if(r.who){ who = Object.prototype.toString.call(r.who)==='[object Array]' ? r.who.slice(0) : [r.who]; }
+      else if(r.member){ who = [r.member]; }
+      else if(r.calendar){ who = [r.calendar]; }
+      else if(r.cal){ who = [r.cal]; }
+      var title = String(r.summary || r.title || '일정');
+      var mapped = [];
+      /* 제목 앞 (구성원1), (구성원2) 같은 표시는 구성원으로 옮기고 떼어 낸다 */
+      var pm = title.match(/^\(\s*([^)]*)\)\s*/);
+      if(pm){
+        var parts = pm[1].split(/[,\s·\/]+/);
+        for(var q=0;q<parts.length;q++){ var pn = matchMember(parts[q]); if(pn) mapped.push(pn); }
+        if(mapped.length) title = title.replace(/^\(\s*([^)]*)\)\s*/, '');
+      }
+      if(!mapped.length){
+        for(var k=0;k<who.length;k++){
+          var nm = matchMember(who[k]);
+          if(nm) mapped.push(nm);
+        }
+      }
+      if(!mapped.length) mapped = [MEMBER_DEFAULT[0]];
+      out.push({t: title, s:s, e:e, ad:ad, who:mapped,
+                loc: String(r.location || ''), note: String(r.description || r.note || '').replace(/\s+/g,' ').substring(0,90)});
+    }
+    return out;
+  }
+  function setCalStatus(msg){
+    var el = document.getElementById('calStatus');
+    if(el) el.innerHTML = msg;
+  }
+  function syncCalendar(manual){
+    var url = (document.getElementById('calUrl').value || settings.calUrl || '').trim();
+    if(!url){ if(manual) toast('캘린더 JSON 주소를 먼저 넣어 주세요'); return; }
+    if(!window.fetch){ toast('이 브라우저는 동기화를 지원하지 않아요'); return; }
+    setCalStatus('동기화 중…');
+    fetch(url, {cache:'no-store'}).then(function(r){ return r.text(); }).then(function(txt){
+      var raw;
+      try{ raw = JSON.parse(txt); }
+      catch(e){
+        var m = txt.match(/[\[{][\s\S]*[\]}]/);
+        if(!m) throw new Error('JSON 아님');
+        raw = JSON.parse(m[0]);
+      }
+      var list = normalizeRemote(raw);
+      if(!list.length) throw new Error('일정 0건');
+      state.events = list;
+      remoteAt = Date.now();
+      store.set('fd_remote', list);
+      store.set('fd_remote_at', remoteAt);
+      var d = new Date(remoteAt);
+      setCalStatus('동기화 완료 · ' + list.length + '건 · ' + pad2(d.getHours())+':'+pad2(d.getMinutes()));
+      paintAll();
+      if(manual) toast('캘린더 ' + list.length + '건을 불러왔어요');
+    }).catch(function(err){
+      setCalStatus('동기화 실패: ' + (err && err.message ? err.message : err) + '<br>내장 일정(' + SEED.length + '건)을 계속 보여줘요.');
+      if(manual) toast('동기화 실패 — 주소와 공개 설정을 확인해 주세요');
+    });
+  }
+
+  /* ---------- 테마 ---------- */
+  function paintTheme(){
+    document.documentElement.setAttribute('data-theme', theme);
+    document.getElementById('btnTheme').className = 'icon-btn' + (theme==='light'?' on':'');
+    var seg = document.getElementById('themeSeg');
+    if(seg){
+      var bs = seg.getElementsByTagName('button');
+      for(var i=0;i<bs.length;i++) bs[i].className = (bs[i].getAttribute('data-theme')===theme?'on':'');
+    }
+  }
+
+  function toast(msg){
+    var t = document.getElementById('toast');
+    t.textContent = msg; t.className = 'toast show';
+    window.setTimeout(function(){ t.className = 'toast'; }, 2200);
+  }
+
+  /* ---------- 화면 잠금 (4자리 PIN) ----------
+     - PIN 자체는 소스에 평문으로 두지 않고 해시로만 비교합니다.
+     - 해제 표식은 localStorage('family_dash_unlocked_v1')에 저장 → 같은 브라우저에서는 다시 묻지 않습니다.
+     - <html class="locked"> 상태가 기본값이라, 스크립트가 돌기 전에도 대시보드가 잠긴 채로 뜨고
+       스크립트가 실패해도 잠금이 풀리지 않습니다. */
+  var LOCK_KEY = 'family_dash_unlocked_v1';
+  var PIN_LEN  = 4;
+  var PIN_HASH = 'v1-9a2e849e';   /* 4자리 PIN 의 해시값 */
+  var PIN_OK   = 'v1-5a83dc3d';   /* 잠금 해제 표식(해시와 다른 값) */
+  var pinBuf = '';
+  var pinBusy = false;
+  var pinTries = 0;
+
+  function hash32(s){
+    var h = 2166136261, i;
+    for(i = 0; i < s.length; i++){ h ^= s.charCodeAt(i); h = (h * 16777619) >>> 0; }
+    return 'v1-' + h.toString(16);
+  }
+  function lockRead(){
+    try{ return window.localStorage.getItem(LOCK_KEY); }catch(e){ return null; }
+  }
+  function lockWrite(on){
+    try{
+      if(on) window.localStorage.setItem(LOCK_KEY, PIN_OK);
+      else window.localStorage.removeItem(LOCK_KEY);
+    }catch(e){}
+  }
+  function isLocked(){
+    return (' ' + document.documentElement.className + ' ').indexOf(' locked ') > -1;
+  }
+  function setLockedClass(on){
+    var c = (' ' + (document.documentElement.className || '') + ' ').replace(' locked ', ' ');
+    c = c.replace(/^\s+|\s+$/g, '');
+    document.documentElement.className = on ? (c ? c + ' locked' : 'locked') : c;
+  }
+  function lockMsg(text, isErr){
+    var m = document.getElementById('lockMsg');
+    if(!m) return;
+    m.textContent = text;
+    m.className = 'msg' + (isErr ? ' err' : '');
+  }
+  function paintPin(){
+    var d = document.getElementById('pinDots');
+    if(!d) return;
+    var dots = d.getElementsByTagName('i');
+    for(var i = 0; i < dots.length; i++) dots[i].className = (i < pinBuf.length) ? 'on' : '';
+  }
+  function lockShow(){
+    setLockedClass(true);
+    pinBuf = ''; pinBusy = false; pinTries = 0;
+    paintPin();
+    lockMsg('가족 PIN 4자리를 입력해 주세요', false);
+    var kb = document.getElementById('keypad');
+    var first = kb ? kb.getElementsByTagName('button')[0] : null;
+    if(first && first.focus){ try{ first.focus(); }catch(e){} }
+  }
+  function lockOn(){
+    /* 직접 잠글 때는 해제 표식도 지워서, 새로고침해도 잠긴 채로 남깁니다. */
+    lockWrite(false);
+    var modal = document.getElementById('modal');
+    if(modal) modal.className = 'modal';
+    lockShow();
+  }
+  function lockOff(){
+    lockWrite(true);
+    setLockedClass(false);
+    pinBuf = ''; pinBusy = false; pinTries = 0;
+    paintPin();
+    paintAll();
+    toast('잠금을 풀었어요');
+  }
+  function pinAdd(ch){
+    if(pinBusy || !isLocked()) return;
+    if(pinBuf.length >= PIN_LEN) pinBuf = '';
+    pinBuf += ch;
+    paintPin();
+    if(pinBuf.length === PIN_LEN) pinSubmit();
+  }
+  function pinDel(){
+    if(pinBusy || !isLocked()) return;
+    pinBuf = pinBuf.substring(0, pinBuf.length - 1);
+    paintPin();
+  }
+  function pinSubmit(){
+    if(pinBusy || !isLocked() || pinBuf.length !== PIN_LEN) return;
+    if(hash32(pinBuf) === PIN_HASH){
+      pinBuf = '';
+      lockOff();
+      return;
+    }
+    pinBusy = true;
+    pinTries++;
+    var box = document.getElementById('lockBox');
+    if(box) box.className = 'lock-box shake';
+    lockMsg('PIN이 맞지 않아요 · 다시 입력해 주세요', true);
+    window.setTimeout(function(){
+      if(box) box.className = 'lock-box';
+      pinBuf = ''; pinBusy = false; paintPin();
+      lockMsg(pinTries >= 3 ? '다시 한 번 천천히 입력해 주세요' : '가족 PIN 4자리를 입력해 주세요', false);
+    }, 780);
+  }
+  function initLock(){
+    if(lockRead() === PIN_OK) setLockedClass(false);
+    else lockShow();
+    paintPin();
+  }
+
+  /* ---------- 전체 렌더 ---------- */
+  function paintAll(){
+    paintChips(); paintWeek(); paintAgenda(); paintNext(); paintDDay(); paintTodo(); paintWx(); paintDataStatus();
+  }
+
+  /* ---------- 이벤트 연결 ---------- */
+  function bind(){
+    document.getElementById('chips').addEventListener('click', function(ev){
+      var b = ev.target;
+      while(b && b !== this && !b.getAttribute('data-f')) b = b.parentNode;
+      if(!b || b === this) return;
+      state.filter = b.getAttribute('data-f');
+      paintChips(); paintWeek(); paintAgenda(); paintNext();
+    });
+
+    document.getElementById('week').addEventListener('click', function(ev){
+      var b = ev.target;
+      while(b && b !== this && !b.getAttribute('data-day')) b = b.parentNode;
+      if(!b || b === this) return;
+      var k = b.getAttribute('data-day');
+      state.sel = (k === dayKey(new Date())) ? null : k;
+      paintWeek(); paintAgenda();
+    });
+
+    document.getElementById('btnPrev').addEventListener('click', function(){ state.off -= 7; paintWeek(); });
+    document.getElementById('btnNext').addEventListener('click', function(){ state.off += 7; paintWeek(); });
+    document.getElementById('btnToday').addEventListener('click', function(){ state.off = 0; state.sel = null; paintWeek(); paintAgenda(); });
+
+    document.getElementById('btnTheme').addEventListener('click', function(){
+      theme = (theme === 'dark') ? 'light' : 'dark';
+      store.set('fd_theme', theme); paintTheme();
+    });
+
+    document.getElementById('btnFull').addEventListener('click', function(){
+      var el = document.documentElement, d = document;
+      var isFull = d.fullscreenElement || d.webkitFullscreenElement;
+      try{
+        if(!isFull){
+          if(el.requestFullscreen) el.requestFullscreen();
+          else if(el.webkitRequestFullscreen) el.webkitRequestFullscreen();
+          else toast('이 브라우저는 전체화면을 지원하지 않아요');
+        }else{
+          if(d.exitFullscreen) d.exitFullscreen();
+          else if(d.webkitExitFullscreen) d.webkitExitFullscreen();
+        }
+      }catch(e){ toast('전체화면 전환 실패'); }
+    });
+
+    var modal = document.getElementById('modal');
+    function openModal(){
+      modal.className = 'modal open';
+      document.getElementById('wxAuto').checked = !!settings.wxAuto;
+      document.getElementById('calAuto').checked = !!settings.calAuto;
+      document.getElementById('calUrl').value = settings.calUrl || '';
+      document.getElementById('memberNames').value = store.get('fd_members', MEMBER_DEFAULT).join(', ');
+      document.getElementById('wxLat').value = (settings.lat != null ? settings.lat : WX_DEFAULT.lat);
+      document.getElementById('wxLon').value = (settings.lon != null ? settings.lon : WX_DEFAULT.lon);
+      paintDataStatus();
+      var first = document.getElementById('modalClose');
+      if(first && first.focus) first.focus();
+    }
+    function closeModal(){ modal.className = 'modal'; }
+    document.getElementById('btnSettings').addEventListener('click', openModal);
+    document.getElementById('modalClose').addEventListener('click', closeModal);
+    modal.addEventListener('click', function(ev){ if(ev.target === modal) closeModal(); });
+    document.addEventListener('keydown', function(ev){
+      if(ev.key === 'Escape' || ev.keyCode === 27) closeModal();
+    });
+
+    document.getElementById('wxAuto').addEventListener('change', function(){
+      settings.wxAuto = this.checked; store.set('fd_settings', settings);
+      if(settings.wxAuto) fetchWx(false);
+    });
+    document.getElementById('calAuto').addEventListener('change', function(){
+      settings.calAuto = this.checked; store.set('fd_settings', settings);
+      if(settings.calAuto) syncCalendar(false);
+    });
+    document.getElementById('wxNow').addEventListener('click', function(){ fetchWx(true); });
+    document.getElementById('wxPlaceSave').addEventListener('click', function(){
+      var la = parseFloat(document.getElementById('wxLat').value);
+      var lo = parseFloat(document.getElementById('wxLon').value);
+      if(!(la >= -90 && la <= 90) || !(lo >= -180 && lo <= 180)){ toast('위도·경도를 숫자로 넣어 주세요'); return; }
+      settings.lat = la; settings.lon = lo; store.set('fd_settings', settings);
+      toast('날씨 위치를 저장했어요'); fetchWx(true);
+    });
+    document.getElementById('memberSave').addEventListener('click', function(){
+      var parts = (document.getElementById('memberNames').value || '').split(',');
+      var arr = [];
+      for(var i=0;i<parts.length && arr.length<MEMBER_COLORS.length;i++){
+        var nm = parts[i].replace(/^\s+|\s+$/g,'');
+        if(nm) arr.push(nm);
+      }
+      if(!arr.length){ toast('이름을 하나 이상 넣어 주세요'); return; }
+      store.set('fd_members', arr);
+      buildMembers();
+      if(state.filter !== 'all' && !CLS[state.filter]) state.filter = 'all';
+      paintAll();
+      toast('구성원 이름을 저장했어요');
+    });
+    document.getElementById('calNow').addEventListener('click', function(){ syncCalendar(true); });
+    document.getElementById('calSave').addEventListener('click', function(){
+      settings.calUrl = (document.getElementById('calUrl').value || '').trim();
+      store.set('fd_settings', settings);
+      toast('주소를 저장했어요');
+    });
+
+    var seg = document.getElementById('themeSeg');
+    seg.addEventListener('click', function(ev){
+      var b = ev.target;
+      while(b && b !== this && !b.getAttribute('data-theme')) b = b.parentNode;
+      if(!b || b === this) return;
+      theme = b.getAttribute('data-theme');
+      store.set('fd_theme', theme); paintTheme();
+    });
+
+    document.getElementById('daySub').addEventListener('click', function(ev){
+      var t = ev.target;
+      if(t && t.id === 'agToday'){ state.sel = null; paintWeek(); paintAgenda(); }
+    });
+
+    /* 체크리스트 */
+    var list = document.getElementById('todoList');
+    list.addEventListener('click', function(ev){
+      var row = ev.target;
+      while(row && row !== this && !row.getAttribute('data-id')) row = row.parentNode;
+      if(!row || row === this) return;
+      var id = row.getAttribute('data-id');
+      var isDel = ev.target.className === 'del' || (ev.target.parentNode && ev.target.parentNode.className === 'del');
+      var next = [];
+      for(var i=0;i<todos.length;i++){
+        var t = todos[i];
+        if(t.id !== id){ next.push(t); continue; }
+        if(isDel) continue;
+        next.push({id:t.id, text:t.text, note:t.note, done:!t.done});
+      }
+      todos = next;
+      store.set('fd_todo', todos);
+      paintTodo();
+    });
+    document.getElementById('todoForm').addEventListener('submit', function(ev){
+      ev.preventDefault();
+      var inp = document.getElementById('todoInput');
+      var v = (inp.value || '').replace(/^\s+|\s+$/g,'');
+      if(!v) return;
+      todos.push({id:'t' + (new Date().getTime()), text:v, note:'', done:false});
+      store.set('fd_todo', todos);
+      inp.value = '';
+      paintTodo();
+    });
+
+    /* ---------- 화면 잠금 ---------- */
+    var keypad = document.getElementById('keypad');
+    if(keypad){
+      keypad.addEventListener('click', function(ev){
+        var b = ev.target;
+        while(b && b !== this && !b.getAttribute('data-k')) b = b.parentNode;
+        if(!b || b === this) return;
+        var k = b.getAttribute('data-k');
+        if(k === 'del') pinDel();
+        else if(k === 'ok') pinSubmit();
+        else pinAdd(k);
+      });
+    }
+    document.getElementById('lockNow').addEventListener('click', lockOn);
+    /* 키보드 숫자키·리모컨 숫자버튼으로도 바로 입력 */
+    document.addEventListener('keydown', function(ev){
+      if(!isLocked()) return;
+      var k = ev.key || '', code = ev.keyCode || ev.which || 0;
+      if(k.length === 1 && k >= '0' && k <= '9'){ ev.preventDefault(); pinAdd(k); return; }
+      if(code >= 48 && code <= 57){ ev.preventDefault(); pinAdd(String(code - 48)); return; }
+      if(code >= 96 && code <= 105){ ev.preventDefault(); pinAdd(String(code - 96)); return; }
+      if(code === 8 || code === 46){ ev.preventDefault(); pinDel(); return; }
+      if(code === 13){
+        var ae = document.activeElement;
+        /* 숫자 키패드 버튼에 포커스가 있을 때는 그 버튼의 기본 동작(클릭)에 맡깁니다 */
+        if(ae && ae.tagName === 'BUTTON' && ae.getAttribute('data-k')) return;
+        ev.preventDefault(); pinSubmit(); return;
+      }
+    });
+
+    /* 창 크기 변경 시 다시 그리기(주/일 계산 유지) */
+    var rt = null;
+    window.addEventListener('resize', function(){
+      if(rt) window.clearTimeout(rt);
+      rt = window.setTimeout(paintAll, 200);
+    });
+  }
+
+  function paintDataStatus(){
+    var el = document.getElementById('dataStatus');
+    if(!el) return;
+    var d = remoteAt ? new Date(remoteAt) : null;
+    var isRemote = (state.events !== SEED);
+    el.innerHTML =
+      '일정 <b>' + state.events.length + '건</b> · ' + (isRemote ? '구글 캘린더 동기화본' : (SEED.length ? '내장 데이터' : '내장 없음 — 캘린더 주소를 넣어 주세요')) +
+      (d ? ' · 마지막 동기화 ' + (d.getMonth()+1)+'/'+d.getDate()+' '+pad2(d.getHours())+':'+pad2(d.getMinutes()) : '') +
+      '<br>날씨 기준 ' + esc(state.wx.at||'') + (state.wx.live?' (Open-Meteo)':' (Apple Weather · AirKorea)') +
+      '<br>설정은 이 브라우저에만 저장됩니다. TV와 태블릿은 각각 따로 설정해 주세요.';
+  }
+
+  /* ---------- 시작 ---------- */
+  initLock();
+  paintTheme();
+  paintAll();
+  tick();
+  window.setInterval(tick, 1000);
+
+  if(!window.fetch){
+    setWxStatus('이 브라우저는 자동 갱신을 지원하지 않습니다.');
+  }else{
+    if(settings.wxAuto){
+      fetchWx(false);
+      window.setInterval(function(){ fetchWx(false); }, 30*60*1000);
+    }
+    if(settings.calAuto && settings.calUrl){
+      syncCalendar(false);
+      window.setInterval(function(){ syncCalendar(false); }, 15*60*1000);
+    }
+  }
+  bind();
+  paintDataStatus();
+})();
+</script>
+</body>
+</html>
